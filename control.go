@@ -14,29 +14,29 @@ type BasicControl struct {
 	Border     LineType
 	HAlign     HorizontalAlignment
 	VAlign     VerticalAlignment
+	Margin     Sides
+	Padding    Sides
 }
 
-type HorizontalAlignment int
+func (ctrl *BasicControl) GetBorderBox() Box {
+	return ctrl.Position.Minus(ctrl.Margin)
+}
 
-const (
-	HorizontalAlignmentLeft = iota
-	HorizontalAlignmentCenter
-	HorizontalAlignmentRight
-)
-
-type VerticalAlignment int
-
-const (
-	HorizontalAlignmentTop = iota
-	HorizontalAlignmentMiddle
-	HorizontalAlignmentBottom
-)
+func (ctrl *BasicControl) GetContentBox() Box {
+	// substract padding and margin
+	contentBox := ctrl.Position.Minus(ctrl.Margin).Minus(ctrl.Padding)
+	// substract border if applicable
+	if ctrl.Border != LineNone {
+		contentBox = contentBox.Minus(Sides{1, 1, 1, 1})
+	}
+	return contentBox
+}
 
 func (ctrl *BasicControl) DrawBorder() {
 	if ctrl.Border == LineNone {
 		return
 	}
-	DrawRect(ctrl.Position, ctrl.Border, ctrl.Foreground, ctrl.Background)
+	DrawRect(ctrl.GetBorderBox(), ctrl.Border, ctrl.Foreground, ctrl.Background)
 }
 
 type Control interface {

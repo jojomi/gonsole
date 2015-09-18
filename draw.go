@@ -4,17 +4,6 @@ package gonsole
 
 import "github.com/nsf/termbox-go"
 
-type LineType int
-
-const (
-	LineNone = iota
-	LineTransparent
-	LineSingle
-	LineDouble
-	LineDashed
-	LineDotted
-)
-
 func DrawRect(box Box, lineType LineType, color, backgroundColor termbox.Attribute) {
 	right := box.Right()
 	bottom := box.Bottom()
@@ -47,13 +36,19 @@ func DrawLineVertical(left, top, height int, lineType LineType, color, backgroun
 }
 
 func DrawCursor() {
-
 }
 
 // TODO support line breaking for multiline strings
 // TODO support alignment
-func DrawText(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
+func DrawTextBox(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
 	// get number of lines to draw
+	//
+}
+
+func DrawTextSimple(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
+	for index, char := range text {
+		termbox.SetCell(box.Left+index, box.Top, char, foreground, background)
+	}
 }
 
 func getLineRunes(lineType LineType) []rune {
