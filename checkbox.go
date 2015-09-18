@@ -20,6 +20,7 @@ func NewCheckbox(id string) *Checkbox {
 	checkbox := &Checkbox{
 		label: label,
 	}
+	checkbox.SetID(id)
 	return checkbox
 }
 

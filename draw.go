@@ -4,7 +4,23 @@ package gonsole
 
 import "github.com/nsf/termbox-go"
 
-func DrawRect(box Box, lineType LineType, color, backgroundColor termbox.Attribute) {
+func ClearRect(box Box, color, backgroundColor termbox.Attribute) {
+	for x := box.Left; x < box.Right(); x++ {
+		for y := box.Top; y < box.Bottom(); y++ {
+			termbox.SetCell(x, y, ' ', color, backgroundColor)
+		}
+	}
+}
+
+func FillRect(box Box, color, backgroundColor termbox.Attribute) {
+	for x := box.Left; x < box.Right(); x++ {
+		for y := box.Top; y < box.Bottom(); y++ {
+			termbox.SetCell(x, y, ' ', color, backgroundColor)
+		}
+	}
+}
+
+func DrawBorder(box Box, lineType LineType, color, backgroundColor termbox.Attribute) {
 	right := box.Right()
 	bottom := box.Bottom()
 	runes := getLineRunes(lineType)
@@ -59,8 +75,12 @@ func getLineRunes(lineType LineType) []rune {
 		runes = []rune{' ', ' ', ' ', ' ', ' ', ' '}
 	case LineSingle:
 		runes = []rune{'─', '│', '┌', '┐', '└', '┘'}
+	case LineSingleCorners:
+		runes = []rune{' ', ' ', '┌', '┐', '└', '┘'}
 	case LineDouble:
 		runes = []rune{'═', '║', '╔', '╗', '╚', '╝'}
+	case LineDoubleCorners:
+		runes = []rune{' ', ' ', '╔', '╗', '╚', '╝'}
 	case LineDashed:
 		runes = []rune{'╌', '╎', '┌', '┐', '└', '┘'}
 	case LineDotted:

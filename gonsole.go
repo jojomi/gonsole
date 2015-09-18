@@ -4,14 +4,17 @@ import "github.com/nsf/termbox-go"
 
 // App holds the global gonsole state.
 type App struct {
-	CloseKey     termbox.Key
-	windows      []*Window
-	activeWindow *Window
+	CloseKey        termbox.Key
+	EventDispatcher *EventDispatcher
+	windows         []*Window
+	activeWindow    *Window
 }
 
 // NewApp creates a new app
 func NewApp() *App {
-	app := &App{}
+	app := &App{
+		EventDispatcher: NewEventDispatcher(),
+	}
 	return app
 }
 
@@ -23,6 +26,7 @@ func (app *App) Repaint() {
 }
 
 func (app *App) AddWindow(win *Window) {
+	win.App = app
 	app.windows = append(app.windows, win)
 
 	// first window is automatically activated
@@ -56,6 +60,9 @@ mainloop:
 		case termbox.EventError:
 			panic(ev.Err)
 		}
+
+		// dispatch event to active window
+		app.activeWindow.ParseEvent(&ev)
 
 		app.Repaint()
 	}

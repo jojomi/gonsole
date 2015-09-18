@@ -15,6 +15,15 @@ func (b Box) Bottom() int {
 	return b.Top + b.Height - 1
 }
 
+func (b Box) Absolute(bParent Box) Box {
+	return Box{
+		Top:    bParent.Top + b.Top,
+		Left:   bParent.Left + b.Left,
+		Width:  b.Width,
+		Height: b.Height,
+	}
+}
+
 func (b Box) Plus(s Sides) Box {
 	return Box{
 		Left:   b.Left - s.Left,
@@ -46,7 +55,9 @@ const (
 	LineNone = iota
 	LineTransparent
 	LineSingle
+	LineSingleCorners
 	LineDouble
+	LineDoubleCorners
 	LineDashed
 	LineDotted
 )

@@ -8,6 +8,7 @@ type Label struct {
 
 func NewLabel(id string) *Label {
 	label := &Label{}
+	label.SetID(id)
 	return label
 }
 
