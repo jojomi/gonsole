@@ -26,3 +26,19 @@ func (ctrl *ContainerControl) AddControl(control Control) {
 func (ctrl *ContainerControl) Children() []Control {
 	return ctrl.children
 }
+
+func (ctrl *ContainerControl) ChildrenDeep() []Control {
+	controls := make([]Control, 0)
+	for _, control := range ctrl.children {
+		container, ok := control.(*ContainerControl)
+		if ok {
+			children := container.ChildrenDeep()
+			for _, child := range children {
+				controls = append(controls, child)
+			}
+		} else {
+			controls = append(controls, control)
+		}
+	}
+	return controls
+}

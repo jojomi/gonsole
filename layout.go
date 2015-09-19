@@ -49,6 +49,24 @@ type Sides struct {
 	Left   int
 }
 
+func (s Sides) Plus(s2 Sides) Sides {
+	return Sides{
+		Left:   s.Left + s2.Left,
+		Top:    s.Top + s2.Top,
+		Right:  s.Right + s2.Right,
+		Bottom: s.Bottom + s2.Bottom,
+	}
+}
+
+func (s Sides) Minus(s2 Sides) Sides {
+	return Sides{
+		Left:   s.Left - s2.Left,
+		Top:    s.Top - s2.Top,
+		Right:  s.Right - s2.Right,
+		Bottom: s.Bottom - s2.Bottom,
+	}
+}
+
 type LineType int
 
 const (

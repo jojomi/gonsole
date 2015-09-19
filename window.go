@@ -1,6 +1,10 @@
 package gonsole
 
-import "github.com/nsf/termbox-go"
+import (
+	"fmt"
+
+	"github.com/nsf/termbox-go"
+)
 
 // Window is the top-level struct in gonsole library.
 type Window struct {
@@ -12,7 +16,7 @@ type Window struct {
 	Foreground termbox.Attribute
 
 	// internal state
-	FocussedControl Control
+	focussedControl Control
 	controls        []Control
 	dirty           bool
 }
@@ -23,6 +27,14 @@ func NewWindow(id string) *Window {
 		ID: id,
 	}
 	return win
+}
+
+func (win *Window) SetFocussedControl(ctrl Control) {
+	win.focussedControl = ctrl
+}
+
+func (win *Window) FocussedControl() Control {
+	return win.focussedControl
 }
 
 // IsDirty returns true if the window is marked as dirty
@@ -38,18 +50,95 @@ func (win *Window) Pollute() {
 	win.dirty = true
 }
 
+func (win *Window) FocusPrev() {
+	win.moveFocus(-1)
+}
+
+func (win *Window) FocusNext() {
+	win.moveFocus(1)
+}
+
+func (win *Window) moveFocus(num int) {
+	focusControls := win.getFocusControls()
+	currentFocusControl := win.FocussedControl()
+	// get focus index
+	index := -1
+	//termbox.Close()
+	for i, loopFC := range focusControls {
+		//fmt.Println(loopFC.ID(), currentFocusControl.ID())
+		if loopFC.ID() == currentFocusControl.ID() {
+			index = i
+		}
+	}
+	//fmt.Println(index)
+	newIndex := (index + num + len(focusControls)) % len(focusControls)
+	if index == -1 {
+		newIndex = 0
+	}
+	fmt.Println(index, newIndex)
+	newFocusControl := focusControls[newIndex]
+	win.SetFocussedControl(newFocusControl)
+	//fmt.Println(currentFocusControl.ID(), newFocusControl.ID())
+
+	// TODO update focus, mark dirty
+	currentFocusControl.Pollute()
+	newFocusControl.Pollute()
+	win.FullRepaint()
+}
+
+func (win *Window) getFocusControls() []Control {
+	// TODO order by tabIndex and filter non-focussable controls
+	focusControls := []Control{}
+	for _, control := range win.getControlsDeep() {
+		if control.Focussable() {
+			focusControls = append(focusControls, control)
+		}
+	}
+	return focusControls
+}
+
+func (win *Window) getControlsDeep() []Control {
+	//termbox.Close()
+	controls := make([]Control, 0)
+	for _, control := range win.controls {
+		//fmt.Println(control.ID())
+		container, ok := control.(Container)
+		//fmt.Println(ok)
+		if ok {
+			children := container.ChildrenDeep()
+			//fmt.Println(len(children))
+			for _, child := range children {
+				controls = append(controls, child)
+			}
+		} else {
+			controls = append(controls, control)
+		}
+	}
+	return controls
+}
+
 // return true if event was parsed and should not continue bubbling up
 func (win *Window) ParseEvent(ev *termbox.Event) bool {
 	// TODO window level event parsing, support tabbing for changing focus
 
 	// dispatch event to currently focussed control
-	if win.FocussedControl.ParseEvent(ev) {
+	if win.FocussedControl().ParseEvent(ev) {
 		return true
 	}
 
 	// focus navigation events
 	// catch tab key if the focussed control did not need it
 	// catch arrow keys if the focussed control did not need them
+	if ev.Type == termbox.EventKey {
+		switch ev.Key {
+		case termbox.KeyTab:
+			win.FocusNext()
+		case termbox.KeyArrowDown:
+			win.FocusNext()
+		case termbox.KeyArrowUp:
+			win.FocusPrev()
+		}
+	}
 
 	return false
 }

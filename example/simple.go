@@ -13,6 +13,8 @@ func main() {
 
 	panel := gonsole.NewPanel("panel1")
 	panel.Position = gonsole.Box{4, 8, 50, 22}
+	panel.Title = "Test Controls"
+	//panel.TitleAlignment =
 	//panel.Background = termbox.ColorWhite
 	panel.SetBorder(gonsole.LineDouble)
 	win.AddControl(panel)
@@ -32,7 +34,7 @@ func main() {
 	ctrlChk.SetBorder(gonsole.LineDouble)
 	panel.AddControl(ctrlChk)
 
-	ctrlChk2 := gonsole.NewCheckbox("chkActive")
+	ctrlChk2 := gonsole.NewCheckbox("chkActive2")
 	ctrlChk2.Position = gonsole.Box{2, 7, 30, 3}
 	ctrlChk2.Checked = false
 	ctrlChk2.Text = "Test with more text"
@@ -44,7 +46,13 @@ func main() {
 	ctrlBtn.SetBorder(gonsole.LineSingle)
 	panel.AddControl(ctrlBtn)
 
-	win.FocussedControl = ctrlBtn
+	ctrlBtn2 := gonsole.NewButton("MyButton2")
+	ctrlBtn2.Position = gonsole.Box{2, 14, 40, 3}
+	ctrlBtn2.Text = "This is my second magic button..."
+	ctrlBtn2.SetBorder(gonsole.LineSingle)
+	panel.AddControl(ctrlBtn2)
+
+	ctrlBtn.Focus()
 
 	app.AddWindow(win)
 
@@ -53,7 +61,6 @@ func main() {
 		ctrlBtn.Text = "--- clicked ---"
 		win.Pollute()
 		//win.Repaint()
-		win.FocussedControl = ctrlBtn
 		win.FullRepaint()
 		return true
 	})

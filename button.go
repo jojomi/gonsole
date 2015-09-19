@@ -13,13 +13,14 @@ func NewButton(id string) *Button {
 	button := &Button{}
 	button.SetID(id)
 	button.SetBorder(LineSingleCorners)
+	button.SetFocussable(true)
 	return button
 }
 
 func (c *Button) Repaint() {
 	c.BasicControl.Repaint()
 	// content area
-	DrawTextSimple(c.Text, c.GetContentBox(), c.Foreground, c.Background)
+	DrawTextSimple(c.Text, c.ContentBox(), c.Foreground, c.Background)
 }
 
 func (btn *Button) ParseEvent(ev *termbox.Event) bool {

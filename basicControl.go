@@ -10,9 +10,10 @@ type BasicControl struct {
 	Position   Box
 	Visible    bool
 	Enabled    bool
-	Focussable bool
+	focussable bool
 	ZIndex     int
 	TabIndex   int
+	dirty      bool
 
 	// styling
 	Foreground termbox.Attribute
@@ -31,15 +32,15 @@ func (ctrl *BasicControl) GetAbsolutePosition() Box {
 	return ctrl.Position
 }
 
-func (ctrl *BasicControl) GetBorderBox() Box {
+func (ctrl *BasicControl) BorderBox() Box {
 	return ctrl.GetAbsolutePosition().Minus(ctrl.Margin)
 }
 
-func (ctrl *BasicControl) GetContentBox() Box {
+func (ctrl *BasicControl) ContentBox() Box {
 	// substract padding and margin
 	contentBox := ctrl.GetAbsolutePosition().Minus(ctrl.Margin).Minus(ctrl.Padding)
 	// substract border if applicable
-	if ctrl.Border() != LineNone {
+	if ctrl.HasBorder() {
 		contentBox = contentBox.Minus(Sides{1, 1, 1, 1})
 	}
 	return contentBox
@@ -53,7 +54,7 @@ func (ctrl *BasicControl) DrawBorder() {
 	if ctrl.Focussed() {
 		borderForeground = termbox.ColorYellow
 	}
-	DrawBorder(ctrl.GetBorderBox(), ctrl.Border(), borderForeground, ctrl.Background)
+	DrawBorder(ctrl.BorderBox(), ctrl.Border(), borderForeground, ctrl.Background)
 }
 
 func (ctrl *BasicControl) ParseEvent(ev *termbox.Event) bool {
@@ -69,6 +70,14 @@ func (ctrl *BasicControl) SetID(id string) {
 	ctrl.id = id
 }
 
+func (ctrl *BasicControl) Dirty() bool {
+	return ctrl.dirty
+}
+
+func (ctrl *BasicControl) Pollute() {
+	ctrl.dirty = true
+}
+
 func (ctrl *BasicControl) SetWindow(win *Window) {
 	ctrl.window = win
 }
@@ -81,6 +90,10 @@ func (ctrl *BasicControl) SetBorder(border LineType) {
 	ctrl.border = border
 }
 
+func (ctrl *BasicControl) HasBorder() bool {
+	return ctrl.border != LineNone
+}
+
 func (ctrl *BasicControl) AddEventListener(eventType string, handler func(ev *Event) bool) {
 	ctrl.Window().App.EventDispatcher.AddEventListener(ctrl, eventType, handler)
 }
@@ -90,7 +103,7 @@ func (ctrl *BasicControl) SubmitEvent(ev *Event) {
 }
 
 func (ctrl *BasicControl) Repaint() {
-	ClearRect(ctrl.GetBorderBox(), termbox.ColorDefault, termbox.ColorDefault)
+	ClearRect(ctrl.BorderBox(), termbox.ColorDefault, termbox.ColorDefault)
 	if ctrl.Background != 0 {
 		FillRect(ctrl.Position, ctrl.Foreground, ctrl.Background)
 	}
@@ -99,11 +112,19 @@ func (ctrl *BasicControl) Repaint() {
 }
 
 func (ctrl *BasicControl) Focussed() bool {
-	return ctrl.Window().FocussedControl.ID() == ctrl.ID()
+	return ctrl.Window().FocussedControl().ID() == ctrl.ID()
 }
 
 func (ctrl *BasicControl) Focus() {
-	// TODO implement
+	ctrl.Window().SetFocussedControl(ctrl)
+}
+
+func (ctrl *BasicControl) Focussable() bool {
+	return ctrl.focussable
+}
+
+func (ctrl *BasicControl) SetFocussable(focussable bool) {
+	ctrl.focussable = focussable
 }
 
 func (ctrl *BasicControl) Parent() Control {

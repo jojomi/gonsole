@@ -15,6 +15,13 @@ func NewPanel(id string) *Panel {
 
 func (c *Panel) Repaint() {
 	c.ContainerControl.Repaint()
-	// content area
-	// TODO implement in parent class
+	// draw Title
+	if c.Title != "" {
+		if c.Border() == LineNone {
+			c.Padding = c.Padding.Plus(Sides{Top: 1})
+		}
+		DrawTextSimple(" "+c.Title+" ", c.BorderBox().Minus(Sides{Left: 2}), c.Foreground, c.Background)
+	}
+
+	// content area (ContainerControl takes care of drawing the children)
 }

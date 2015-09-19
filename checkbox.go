@@ -21,6 +21,7 @@ func NewCheckbox(id string) *Checkbox {
 		label: label,
 	}
 	checkbox.SetID(id)
+	checkbox.SetFocussable(true)
 	return checkbox
 }
 
@@ -33,11 +34,15 @@ func (c *Checkbox) Repaint() {
 	} else {
 		icon = '▢'
 	}
-	contentBox := c.GetContentBox()
-	termbox.SetCell(contentBox.Left, contentBox.Top, icon, c.Foreground, c.Background)
+	contentBox := c.ContentBox()
+	foreground := c.Foreground
+	if c.Focussed() && !c.HasBorder() {
+		foreground = termbox.ColorYellow
+	}
+	termbox.SetCell(contentBox.Left, contentBox.Top, icon, foreground, c.Background)
 	// Label
 	label := c.label
 	label.Text = c.Text
-	label.Position = c.GetContentBox().Minus(Sides{Left: 2})
+	label.Position = c.ContentBox().Minus(Sides{Left: 2})
 	label.Repaint()
 }

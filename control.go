@@ -8,6 +8,8 @@ type Control interface {
 
 	Focussed() bool
 	Focus()
+	Focussable() bool
+	SetFocussable(focussable bool)
 
 	SetWindow(win *Window)
 	Window() *Window
@@ -17,7 +19,10 @@ type Control interface {
 
 	Border() LineType
 	SetBorder(lineType LineType)
+	HasBorder() bool
 
+	Dirty() bool
+	Pollute()
 	Repaint()
 
 	GetAbsolutePosition() Box
@@ -26,4 +31,10 @@ type Control interface {
 	ParseEvent(ev *termbox.Event) bool
 	SubmitEvent(ev *Event)
 	AddEventListener(eventType string, handler func(ev *Event) bool)
+}
+
+type Container interface {
+	Control
+	Children() []Control
+	ChildrenDeep() []Control
 }
