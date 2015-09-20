@@ -5,6 +5,7 @@ import "github.com/nsf/termbox-go"
 type Control interface {
 	ID() string
 	SetID(id string)
+	Init(id string)
 
 	Focussed() bool
 	Focus()

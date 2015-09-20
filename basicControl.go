@@ -25,6 +25,11 @@ type BasicControl struct {
 	Padding    Sides
 }
 
+func (ctrl *BasicControl) Init(id string) {
+	ctrl.SetID(id)
+	ctrl.Pollute()
+}
+
 func (ctrl *BasicControl) GetAbsolutePosition() Box {
 	if parent := ctrl.Parent(); parent != nil {
 		return ctrl.Position.Absolute(parent.GetAbsolutePosition())
@@ -103,6 +108,9 @@ func (ctrl *BasicControl) SubmitEvent(ev *Event) {
 }
 
 func (ctrl *BasicControl) Repaint() {
+	if !ctrl.Dirty() {
+		return
+	}
 	ClearRect(ctrl.BorderBox(), termbox.ColorDefault, termbox.ColorDefault)
 	if ctrl.Background != 0 {
 		FillRect(ctrl.Position, ctrl.Foreground, ctrl.Background)

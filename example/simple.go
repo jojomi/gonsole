@@ -16,7 +16,7 @@ func main() {
 	panel.Title = "Test Controls"
 	//panel.TitleAlignment =
 	//panel.Background = termbox.ColorWhite
-	panel.SetBorder(gonsole.LineDouble)
+	panel.SetBorder(gonsole.LineDashed)
 	win.AddControl(panel)
 	//win.Background = termbox.ColorBlue
 
@@ -52,16 +52,31 @@ func main() {
 	ctrlBtn2.SetBorder(gonsole.LineSingle)
 	panel.AddControl(ctrlBtn2)
 
-	ctrlBtn.Focus()
+	ctrlChk2.Focus()
 
 	app.AddWindow(win)
 
 	// events
-	ctrlBtn.AddEventListener("click", func(ev *gonsole.Event) bool {
+	ctrlBtn.AddEventListener("clicked", func(ev *gonsole.Event) bool {
 		ctrlBtn.Text = "--- clicked ---"
-		win.Pollute()
-		//win.Repaint()
-		win.FullRepaint()
+		return true
+	})
+
+	ctrlBtn2.AddEventListener("clicked", func(ev *gonsole.Event) bool {
+		btn := ev.Source.(*gonsole.Button)
+		btn.Text = "Clicked button"
+		return true
+	})
+
+	ctrlChk2.AddEventListener("checked", func(ev *gonsole.Event) bool {
+		chk := ev.Source.(*gonsole.Checkbox)
+		chk.Text = "works"
+		return true
+	})
+
+	ctrlChk2.AddEventListener("unchecked", func(ev *gonsole.Event) bool {
+		chk := ev.Source.(*gonsole.Checkbox)
+		chk.Text = "does not work"
 		return true
 	})
 

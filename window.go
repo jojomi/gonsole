@@ -1,10 +1,6 @@
 package gonsole
 
-import (
-	"fmt"
-
-	"github.com/nsf/termbox-go"
-)
+import "github.com/nsf/termbox-go"
 
 // Window is the top-level struct in gonsole library.
 type Window struct {
@@ -63,27 +59,22 @@ func (win *Window) moveFocus(num int) {
 	currentFocusControl := win.FocussedControl()
 	// get focus index
 	index := -1
-	//termbox.Close()
 	for i, loopFC := range focusControls {
-		//fmt.Println(loopFC.ID(), currentFocusControl.ID())
 		if loopFC.ID() == currentFocusControl.ID() {
 			index = i
 		}
 	}
-	//fmt.Println(index)
 	newIndex := (index + num + len(focusControls)) % len(focusControls)
 	if index == -1 {
 		newIndex = 0
 	}
-	fmt.Println(index, newIndex)
 	newFocusControl := focusControls[newIndex]
 	win.SetFocussedControl(newFocusControl)
-	//fmt.Println(currentFocusControl.ID(), newFocusControl.ID())
 
-	// TODO update focus, mark dirty
+	// update focus, mark dirty
 	currentFocusControl.Pollute()
 	newFocusControl.Pollute()
-	win.FullRepaint()
+	//win.FullRepaint()
 }
 
 func (win *Window) getFocusControls() []Control {

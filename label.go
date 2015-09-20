@@ -8,11 +8,15 @@ type Label struct {
 
 func NewLabel(id string) *Label {
 	label := &Label{}
-	label.SetID(id)
+	label.Init(id)
 	return label
 }
 
 func (l *Label) Repaint() {
-	l.DrawBorder()
+	if !l.Dirty() {
+		return
+	}
+	l.BasicControl.Repaint()
+
 	DrawTextSimple(l.Text, l.ContentBox(), l.Foreground, l.Background)
 }

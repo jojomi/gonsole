@@ -20,19 +20,23 @@ func NewCheckbox(id string) *Checkbox {
 	checkbox := &Checkbox{
 		label: label,
 	}
-	checkbox.SetID(id)
+	checkbox.Init(id)
 	checkbox.SetFocussable(true)
 	return checkbox
 }
 
 func (c *Checkbox) Repaint() {
-	c.DrawBorder()
+	if !c.Dirty() {
+		return
+	}
+	c.BasicControl.Repaint()
+
 	// Box
 	var icon rune
 	if c.Checked {
 		icon = '☑'
 	} else {
-		icon = '▢'
+		icon = '☐'
 	}
 	contentBox := c.ContentBox()
 	foreground := c.Foreground
@@ -44,5 +48,32 @@ func (c *Checkbox) Repaint() {
 	label := c.label
 	label.Text = c.Text
 	label.Position = c.ContentBox().Minus(Sides{Left: 2})
+	// make sure the label is repainted too
+	label.Pollute()
 	label.Repaint()
+}
+
+func (chk *Checkbox) ParseEvent(ev *termbox.Event) bool {
+	switch ev.Type {
+	case termbox.EventKey:
+		switch ev.Key {
+		case termbox.KeyEnter:
+			fallthrough
+		case termbox.KeySpace:
+			// change state
+			chk.Checked = !chk.Checked
+			// events
+			if chk.Checked {
+				chk.SubmitEvent(&Event{"checked", chk, nil})
+			} else {
+				chk.SubmitEvent(&Event{"unchecked", chk, nil})
+			}
+			chk.SubmitEvent(&Event{"changed", chk, nil})
+			return true
+		}
+	case termbox.EventError:
+		panic(ev.Err)
+	}
+
+	return false
 }
