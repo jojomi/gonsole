@@ -47,7 +47,7 @@ func (c *Checkbox) Repaint() {
 	// Label
 	label := c.label
 	label.Text = c.Text
-	label.Position = c.ContentBox().Minus(Sides{Left: 2})
+	label.Position = c.ContentBox().Minus(Sides{Left: 2}).Position()
 	// make sure the label is repainted too
 	label.Pollute()
 	label.Repaint()

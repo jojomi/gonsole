@@ -1,5 +1,12 @@
 package gonsole
 
+import (
+	"fmt"
+	"math"
+	"regexp"
+	"strconv"
+)
+
 type Box struct {
 	Left   int
 	Top    int
@@ -42,6 +49,15 @@ func (b Box) Minus(s Sides) Box {
 	}
 }
 
+func (b Box) Position() Position {
+	return Position{
+		Left:   strconv.Itoa(b.Left),
+		Top:    strconv.Itoa(b.Top),
+		Width:  strconv.Itoa(b.Width),
+		Height: strconv.Itoa(b.Height),
+	}
+}
+
 type Sides struct {
 	Top    int
 	Right  int
@@ -64,6 +80,63 @@ func (s Sides) Minus(s2 Sides) Sides {
 		Top:    s.Top - s2.Top,
 		Right:  s.Right - s2.Right,
 		Bottom: s.Bottom - s2.Bottom,
+	}
+}
+
+type Position struct {
+	Left   string
+	Top    string
+	Width  string
+	Height string
+}
+
+func calcPosition(m int, p string) int {
+	re := regexp.MustCompile(`^(\d+%?)([+-]\d+)?$`)
+	values := re.FindStringSubmatch(p)
+
+	if len(values) < 2 {
+		panic(fmt.Sprintf("invalid position '%s'", p))
+	}
+
+	value := 0
+
+	if values[1][len(values[1])-1:] == "%" {
+		percent, err := strconv.Atoi(values[1][:len(values[1])-1])
+		if err != nil || percent > 100 || percent < 0 {
+			panic(fmt.Sprintf("invalid percent value in position '%s'", p))
+		}
+
+		value = int(math.Ceil(float64(m) * (float64(percent) / 100)))
+	} else {
+		v, err := strconv.Atoi(values[1])
+		if err != nil {
+			panic(fmt.Sprintf("invalid value in position '%s'", p))
+		}
+
+		value = v
+	}
+
+	if values[2] != "" {
+		offset, err := strconv.Atoi(values[2][1:])
+		if err != nil || offset < 0 {
+			panic(fmt.Sprintf("invalid offset value in position '%s'", p))
+		}
+		if values[2][0] == '+' {
+			value += offset
+		} else {
+			value -= offset
+		}
+	}
+
+	return value
+}
+
+func (p Position) Box(w, h int) Box {
+	return Box{
+		Left:   calcPosition(w, p.Left),
+		Top:    calcPosition(h, p.Top),
+		Width:  calcPosition(w, p.Width),
+		Height: calcPosition(h, p.Height),
 	}
 }
 
