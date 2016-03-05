@@ -26,7 +26,11 @@ func NewWindow(id string) *Window {
 }
 
 func (win *Window) SetFocussedControl(ctrl Control) {
-	win.focussedControl = ctrl
+	for _, loopFC := range win.getControlsDeep() {
+		if loopFC.ID() == ctrl.ID() {
+			win.focussedControl = loopFC
+		}
+	}
 }
 
 func (win *Window) FocussedControl() Control {
