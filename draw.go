@@ -57,13 +57,26 @@ func DrawCursor() {
 // TODO support line breaking for multiline strings
 // TODO support alignment
 func DrawTextBox(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
-	// get number of lines to draw
-	//
+	x := box.Left
+	y := box.Top
+
+	for _, char := range text {
+		if char == '\r' {
+			x = box.Left
+		} else if char == '\n' {
+			y++
+		} else {
+			termbox.SetCell(x, y, char, foreground, background)
+			x++
+		}
+	}
 }
 
 func DrawTextSimple(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
-	for index, char := range text {
+	index := 0
+	for _, char := range text {
 		termbox.SetCell(box.Left+index, box.Top, char, foreground, background)
+		index++
 	}
 }
 
