@@ -136,6 +136,9 @@ func (win *Window) ParseEvent(ev *termbox.Event) bool {
 
 // Repaint the window
 func (win *Window) Repaint() {
+	width, height := termbox.Size()
+	FillRect(Box{Left: 0, Top: 0, Width: width + 1, Height: height + 1}, win.Foreground, win.Background)
+
 	// TODO implement
 	// loop controls, paint the dirty ones
 	for _, ctrl := range win.GetControls() {
