@@ -27,6 +27,7 @@ type Control interface {
 	Repaint()
 
 	GetAbsolutePosition() Box
+	ContentBox() Box
 
 	// return true if event was parsed and should not continue bubbling up
 	ParseEvent(ev *termbox.Event) bool

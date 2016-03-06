@@ -7,7 +7,7 @@ type BasicControl struct {
 	window     *Window
 	parent     Control
 	id         string
-	Position   Box
+	Position   Position
 	Visible    bool
 	Enabled    bool
 	focussable bool
@@ -32,9 +32,11 @@ func (ctrl *BasicControl) Init(id string) {
 
 func (ctrl *BasicControl) GetAbsolutePosition() Box {
 	if parent := ctrl.Parent(); parent != nil {
-		return ctrl.Position.Absolute(parent.GetAbsolutePosition())
+		parentBox := parent.ContentBox()
+		return ctrl.Position.Box(parentBox.Width+1, parentBox.Height).Absolute(parentBox)
 	}
-	return ctrl.Position
+	w, h := termbox.Size()
+	return ctrl.Position.Box(w, h)
 }
 
 func (ctrl *BasicControl) BorderBox() Box {
@@ -113,7 +115,7 @@ func (ctrl *BasicControl) Repaint() {
 	}
 	ClearRect(ctrl.BorderBox(), termbox.ColorDefault, termbox.ColorDefault)
 	if ctrl.Background != 0 {
-		FillRect(ctrl.Position, ctrl.Foreground, ctrl.Background)
+		FillRect(ctrl.GetAbsolutePosition(), ctrl.Foreground, ctrl.Background)
 	}
 	ctrl.DrawBorder()
 	// implement details in controls
