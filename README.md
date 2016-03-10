@@ -1,3 +1,30 @@
+# gonsole
+
+This project offers a high level user interface library for golang.
+
+
+# Example
+
+[![asciicast](https://asciinema.org/a/38881.png)](https://asciinema.org/a/38881)
+
+
+# Projects used
+
+* [termbox](https://github.com/nsf/termbox)
+
+
+# See also
+
+* [blessed](https://github.com/chjj/blessed) – A high-level terminal interface library for node.js.
+* [termui](https://github.com/gizak/termui) – Golang terminal dashboard
+
+
+# License
+
+See [here](LICENSE)
+
+
+
 ## Battle Plan
 
 ### v0.1
@@ -17,9 +44,8 @@
 * Edit
 * Checkbox
 * Radiobutton
+* List
 * Dropdown
-* ProgressBar
-* Dialog (Modal)
 
 ### v0.2
 
@@ -32,9 +58,10 @@
 #### Controls
 
 * Textarea
-* List
 * Slider
 * Spinner
+* Dialog (Modal)
+* ProgressBar
 
 
 ### v0.3
